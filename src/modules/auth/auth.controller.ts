@@ -1,5 +1,4 @@
 import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
-import { Admin } from '../admin/admin.entity';
 import { AuthService } from './auth.service';
 import { UsernameLoginDto } from './dto/admin-login.dto';
 

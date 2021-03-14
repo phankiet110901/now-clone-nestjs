@@ -4,25 +4,19 @@ import { Admin } from '../admin/admin.entity';
 import { AdminRepository } from '../admin/admin.repository';
 import { UsernameLoginDto } from './dto/admin-login.dto';
 import * as jwt from 'jsonwebtoken';
+import { AuthHelper } from 'src/helper/auth.helper';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(Admin)
     private readonly adminRepo: AdminRepository,
+    private readonly authHelper: AuthHelper,
   ) {}
 
   async verifyAdmin(usernameLoginDto: UsernameLoginDto): Promise<Object> {
     const admin: Admin = await this.adminRepo.verifyAdmin(usernameLoginDto);
-    const token: string = jwt.sign(
-      {
-        idAdmin: admin.id_admin,
-      },
-      process.env.SECRET_KEY,
-      {
-        expiresIn: '7d',
-      },
-    );
+    const token: string = this.authHelper.signToken({ id: admin.id_admin });
     return {
       username: admin.username,
       address: admin.username,

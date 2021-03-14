@@ -36,3 +36,5 @@ export class Admin extends BaseEntity {
     this.password = await bcrypt.hash(this.password, +process.env.BCRYPT_SALT);
   }
 }
+
+

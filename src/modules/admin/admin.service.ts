@@ -18,4 +18,8 @@ export class AdminService {
   async createAdmin(createAdminDto: CreateAdminDto): Promise<Admin> {
     return await this.adminRepo.createAdmin(createAdminDto);
   }
+
+  async getAdminPagination(limit: number, currentPage: number): Promise<object> {
+    return this.adminRepo.getAdminPagination(limit, currentPage);
+  }
 }
