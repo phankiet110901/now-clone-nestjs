@@ -1,23 +1,33 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AuthHelper } from 'src/helper/auth.helper';
+import { AdminRepository } from '../admin.repository';
 
 export class AdminGuard implements CanActivate {
-  private authHelper;
+  constructor(
+    @InjectRepository(AdminRepository)
+    readonly adminRepo: AdminRepository,
+    readonly helper: AuthHelper,
+  ) {}
 
-  constructor(helper) {
-    this.authHelper = helper;
-  }
-
-  canActivate(context: ExecutionContext): Promise<boolean> | boolean {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
     if (!request.headers.authorization) {
       return false;
     }
-    this.handleAuth(request.headers.authorization);
-    return true;
+
+    return await this.handleAuth(request.headers.authorization);
   }
 
-  handleAuth(token: string) {
-    return this.authHelper.verifyToken(token);
+  async handleAuth(token: string): Promise<boolean> {
+    const id: string = this.helper.verifyToken(token);
+    const admin = await this.adminRepo.findOne(id);
+
+    if (!admin) {
+      return false;
+    }
+
+    return true;
   }
 }

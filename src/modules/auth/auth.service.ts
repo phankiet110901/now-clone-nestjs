@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Admin } from '../admin/admin.entity';
 import { AdminRepository } from '../admin/admin.repository';
 import { UsernameLoginDto } from './dto/admin-login.dto';
-import * as jwt from 'jsonwebtoken';
 import { AuthHelper } from 'src/helper/auth.helper';
 
 @Injectable()

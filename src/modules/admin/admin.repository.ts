@@ -18,14 +18,24 @@ export class AdminRepository extends Repository<Admin> {
   }
 
   async createAdmin(createAdminDto: CreateAdminDto): Promise<Admin> {
-    const newAdmin = new Admin();
+    const foundAdmin = await this.findOne({
+      username: createAdminDto.username,
+    });
 
+    if (foundAdmin) {
+      throw new BadRequestException(
+        `Username '${createAdminDto.username}' have already exist !!!`,
+      );
+    }
+
+    const newAdmin = new Admin();
     newAdmin.id_admin = uuidv4();
     newAdmin.username = createAdminDto.username;
     newAdmin.password = createAdminDto.password;
     newAdmin.phone = createAdminDto.phone;
     newAdmin.type_admin = createAdminDto.typeAdmin;
     newAdmin.addresss = createAdminDto.address;
+    await newAdmin.save();
 
     return this.handleReponse(newAdmin);
   }
