@@ -6,6 +6,7 @@ import { UsernameLoginDto } from '../auth/dto/admin-login.dto';
 import { BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { TypeAdmin } from './enum/type-admin.enum';
+import { EditAdminDto } from './dto/edit-admin.dto';
 
 @EntityRepository(Admin)
 export class AdminRepository extends Repository<Admin> {
@@ -84,6 +85,34 @@ export class AdminRepository extends Repository<Admin> {
       totalPage: Math.ceil(count / limit),
       items: items.map((admin) => this.handleReponse(admin)),
     };
+  }
+
+  async editAdmin(editAdmin: EditAdminDto, id: string) {
+    const foundAdmin: Admin = await this.findOne(id);
+    if (!foundAdmin) {
+      throw new BadRequestException(`Can not find admin '${id}' `);
+    }
+
+    foundAdmin.password = await bcrypt.hash(
+      editAdmin.password,
+      +process.env.BCRYPT_SALT,
+    );
+    foundAdmin.addresss = editAdmin.address;
+    foundAdmin.phone = editAdmin.phone;
+
+    await foundAdmin.save();
+    return this.handleReponse(foundAdmin);
+  }
+
+  async deleteAdmin(idAdmin: string): Promise<Admin> {
+    const foundAdmin: Admin = await this.findOne(idAdmin);
+
+    if(!foundAdmin) {
+      throw new BadRequestException(`Can not find admin id '${idAdmin}' `);
+    }
+
+    await this.remove(foundAdmin);
+    return this.handleReponse(foundAdmin);
   }
 
   private handleReponse(admin): Admin {
