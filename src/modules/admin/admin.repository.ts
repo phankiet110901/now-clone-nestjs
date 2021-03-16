@@ -35,7 +35,7 @@ export class AdminRepository extends Repository<Admin> {
     newAdmin.password = createAdminDto.password;
     newAdmin.phone = createAdminDto.phone;
     newAdmin.type_admin = createAdminDto.typeAdmin;
-    newAdmin.addresss = createAdminDto.address;
+    newAdmin.address = createAdminDto.address;
     await newAdmin.save();
 
     return this.handleReponse(newAdmin);
@@ -97,7 +97,7 @@ export class AdminRepository extends Repository<Admin> {
       editAdmin.password,
       +process.env.BCRYPT_SALT,
     );
-    foundAdmin.addresss = editAdmin.address;
+    foundAdmin.address = editAdmin.address;
     foundAdmin.phone = editAdmin.phone;
 
     await foundAdmin.save();

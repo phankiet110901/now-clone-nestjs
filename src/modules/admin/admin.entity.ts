@@ -23,7 +23,7 @@ export class Admin extends BaseEntity {
   phone: string;
 
   @Column()
-  addresss: string;
+  address: string;
 
   @Column({ nullable: true })
   avatar_admin: string;
