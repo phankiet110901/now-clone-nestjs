@@ -15,7 +15,6 @@ export const UploadImg = {
     cb(null, true);
   },
   handleUpload: (req, file, cb) => {
-    console.log(123);
     const fileName: string = file.originalname.split('.')[0];
     const fileExtName: string = extname(file.originalname);
     file.originName = `${fileName}-${uuid()}${fileExtName}`;

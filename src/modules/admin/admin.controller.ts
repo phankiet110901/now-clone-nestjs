@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -46,7 +47,7 @@ export class AdminController {
     @Param('limit', ParseIntPipe) limit: number,
     @Param('page', ParseIntPipe) currentPage: number,
   ): Promise<object> {
-    return this.adminService.getAdminPagination(limit, currentPage);
+    return await this.adminService.getAdminPagination(limit, currentPage);
   }
 
   @Put(':idAdmin')
@@ -56,19 +57,34 @@ export class AdminController {
     @Body() editAdmin: EditAdminDto,
     @Param('idAdmin') id: string,
   ): Promise<Admin> {
-    return this.adminService.editAdmmin(editAdmin, id);
+    return await this.adminService.editAdmmin(editAdmin, id);
   }
 
   @Delete(':idAdmin')
   @UseGuards(RootAdminGuard)
   async delete(@Param('idAdmin') idAdmin: string): Promise<Admin> {
-    return this.adminService.deleteAdmin(idAdmin);
+    return await this.adminService.deleteAdmin(idAdmin);
   }
 
-  @Post('upload-img')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile('file') file) {
-    console.log(file);
-    return 123;
+  @Post('upload-img/:idAdmin')
+  @UseInterceptors(
+    FileInterceptor('avatarAdmin', {
+      fileFilter: UploadImg.fileFilters,
+      storage: diskStorage({
+        destination: './uploads/admin',
+        filename: UploadImg.handleUpload,
+      }),
+    }),
+  )
+  async uploadFile(
+    @UploadedFile() file,
+    @Param('idAdmin') idAdmin: string,
+  ): Promise<Admin> {
+    if (!file) {
+      throw new BadRequestException(
+        `File can not upload, please sure enable to upload this file`,
+      );
+    }
+    return await this.adminService.insertImg(file.filename, idAdmin);
   }
 }

@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { UsernameLoginDto } from '../auth/dto/admin-login.dto';
 import { BadRequestException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as fs from 'fs';
 import { TypeAdmin } from './enum/type-admin.enum';
 import { EditAdminDto } from './dto/edit-admin.dto';
 
@@ -107,17 +108,36 @@ export class AdminRepository extends Repository<Admin> {
   async deleteAdmin(idAdmin: string): Promise<Admin> {
     const foundAdmin: Admin = await this.findOne(idAdmin);
 
-    if(!foundAdmin) {
+    if (!foundAdmin) {
       throw new BadRequestException(`Can not find admin id '${idAdmin}' `);
+    }
+
+    if(foundAdmin.avatar_admin) {
+      fs.unlinkSync(`./uploads/admin/${foundAdmin.avatar_admin}`);
     }
 
     await this.remove(foundAdmin);
     return this.handleReponse(foundAdmin);
   }
 
-  private handleReponse(admin): Admin {
+  async insertImg(fileName: string, idAdmin: string): Promise<Admin> {
+    const foundAdmin: Admin = await this.findOne(idAdmin);
+    if (!foundAdmin) {
+      throw new BadRequestException(`Can not find admin id '${idAdmin}'`);
+    }
+
+    if (foundAdmin.avatar_admin) {
+      fs.unlinkSync(`./uploads/admin/${foundAdmin.avatar_admin}`);
+    }
+    foundAdmin.avatar_admin = fileName;
+    await foundAdmin.save();
+    return this.handleReponse(foundAdmin);
+  }
+
+  private handleReponse(admin: Admin): Admin {
     delete admin.type_admin;
     delete admin.password;
+    admin.avatar_admin = `${process.env.DOMAIN}/admin/${admin.avatar_admin}`;
     return admin;
   }
 }

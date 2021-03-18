@@ -31,4 +31,8 @@ export class AdminService {
   async deleteAdmin(idAdmin: string): Promise<Admin> {
     return await this.adminRepo.deleteAdmin(idAdmin);
   }
+
+  async insertImg(fileName: string, idAdmin: string) {
+    return await this.adminRepo.insertImg(fileName, idAdmin);
+  }
 }
